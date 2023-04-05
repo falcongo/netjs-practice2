@@ -13,6 +13,7 @@ import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { Multer } from "multer";
 import { multerOptions } from "../common/utils/multer.options";
 import { Cat } from "./cats.schema";
+import { AmazonS3FileInterceptor } from 'nestjs-multer-extended';
 
 @Controller('cats')
 @UseInterceptors(SuccessInterceptor)
@@ -51,11 +52,14 @@ export class CatsController {
     @ApiOperation({ summary: '고양이 이미지 업로드' })
     @Post('upload')
     @UseGuards(JwtAuthGuard)
-    @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
-    uploadCatImg(@UploadedFiles() files: Express.Multer.File[], @CurrentUser() cat: Cat) {
-        console.log(files);
+    // @UseInterceptors(FilesInterceptor('image', 10, multerOptions('cats')))
+    @UseInterceptors(AmazonS3FileInterceptor('image', {
+        dynamicPath: 'cats',
+    }))
+    uploadCatImg(@UploadedFiles() file: any, @CurrentUser() cat: Cat) {
+        console.log(file);
         // return { image: `http://localhost:8000/media/cats/${files[0].filename}`};
-        return this.catsService.uploadImg(cat, files);
+        return this.catsService.uploadImg(cat, file);
     }
 
     @ApiOperation({ summary: '모든 고양이 목록' })

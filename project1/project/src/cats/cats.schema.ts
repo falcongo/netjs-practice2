@@ -72,7 +72,7 @@ _CatSchema.virtual('readOnlyData').get(function (this: Cat) {
         id: this.id,
         email: this.email,
         name: this.name,
-        imgUrl: this.imgUrl,
+        imgUrl: `s3 url/${this.imgUrl}`,
         comments: this.comments
     };
 });
